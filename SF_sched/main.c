@@ -9,6 +9,9 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <sys/queue.h>
+
+#define MAX_QUEUE_SIZE 200
 // structure to contain each process.
 struct Process{
     int pid;
@@ -16,6 +19,19 @@ struct Process{
     int *cpu_bursts;
     int *io_bursts;
 };
+
+struct CPUElement{
+    int pid;
+    int time;
+    LIST_ENTRY(CPUELement);
+};
+
+struct IOElement{
+    int pid;
+    int time;
+    LIST_ENTRY(IOElement);
+};
+
 
 int main(int argc, const char * argv[])
 {
@@ -122,7 +138,6 @@ int main(int argc, const char * argv[])
             int cpu_n = 0;
             int io_n = 0;
             for (int j=2; j < space_count; j++){
-                printf("--%d--\n", full[j]);
                 if (j % 2 == 0){
                     // even numbers go in cpu burst
                     process[ln].cpu_bursts[cpu_n] = full[j];
@@ -135,24 +150,27 @@ int main(int argc, const char * argv[])
                     
                 }
             }
-            
-            printf("%d \n", process[ln].io_bursts[0]);
-            printf("%d \n", process[ln].io_bursts[1]);
-            printf("%d \n", process[ln].io_bursts[2]);
-            printf("%d \n", process[ln].io_bursts[3]);
-            
-            
-            printf("%d \n", process[ln].cpu_bursts[0]);
-            printf("%d \n", process[ln].cpu_bursts[1]);
-            printf("%d \n", process[ln].cpu_bursts[2]);
-            printf("%d \n", process[ln].cpu_bursts[3]);
-            printf("%d \n", process[ln].cpu_bursts[4]);
+
 
             process[ln].pid = full[0];
             process[ln].arrival = full[1];
         } // end of line looping
         
-    }
+        // I have each of the processes stored in a struct array at this point, so now I can start
+        // scheduling them.
+        
+        // I'm using list that's built into sys/queue.h because that's easier than making my own
+        LIST_HEAD(CPUHead, CPUElement) cpu_list_head;
+        LIST_HEAD(IOHead, IOElement) io_list_head;
+        
+        LIST_INIT(&cpu_list_head);
+        LIST_INIT(&io_list_head);
+        
+        // now I have a list for CPU processes and IO processes
+
+        
+
+    } // end of file check
 }
 
 
